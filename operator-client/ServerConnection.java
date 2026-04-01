@@ -5,12 +5,10 @@ public class ServerConnection {
     private String host;
     private int port;
 
-    // Conexión para comandos (LIST SENSORS, STATUS, etc.)
     private Socket commandSocket;
     private BufferedReader commandReader;
     private PrintWriter commandWriter;
 
-    // Conexión dedicada solo a recibir alertas
     private Socket alertSocket;
     private BufferedReader alertReader;
     private PrintWriter alertWriter;
@@ -22,38 +20,55 @@ public class ServerConnection {
 
     public boolean connect(String username) {
         try {
-            // Conexión principal para comandos
             commandSocket = new Socket(host, port);
             commandReader = new BufferedReader(new InputStreamReader(commandSocket.getInputStream()));
             commandWriter = new PrintWriter(commandSocket.getOutputStream(), true);
-
             commandWriter.println("REGISTER OPERATOR " + username + "_cmd");
             String response = commandReader.readLine();
             System.out.println("Registro cmd: " + response);
 
-            // Conexión secundaria solo para alertas
             alertSocket = new Socket(host, port);
             alertReader = new BufferedReader(new InputStreamReader(alertSocket.getInputStream()));
             alertWriter = new PrintWriter(alertSocket.getOutputStream(), true);
-
             alertWriter.println("REGISTER OPERATOR " + username + "_alerts");
             String alertResponse = alertReader.readLine();
             System.out.println("Registro alerts: " + alertResponse);
 
             return response != null && response.startsWith("OK");
-
         } catch (IOException e) {
             System.out.println("Error de conexión: " + e.getMessage());
             return false;
         }
     }
 
+    // Para comandos de una sola línea de respuesta
     public String sendCommand(String command) {
         try {
             commandWriter.println(command);
             return commandReader.readLine();
         } catch (IOException e) {
             return "ERROR conexión perdida";
+        }
+    }
+
+    // Para GET DATA que devuelve múltiples líneas
+    public String sendCommandMultiLine(String command) {
+        try {
+            commandSocket.setSoTimeout(500);
+            commandWriter.println(command);
+            StringBuilder sb = new StringBuilder();
+            String line;
+            try {
+                while ((line = commandReader.readLine()) != null) {
+                    sb.append(line).append("\n");
+                }
+            } catch (java.net.SocketTimeoutException e) {
+                // Timeout = ya no hay más líneas, salir normalmente
+            }
+            commandSocket.setSoTimeout(0);
+            return sb.toString().trim();
+        } catch (IOException e) {
+            return "ERROR " + e.getMessage();
         }
     }
 
