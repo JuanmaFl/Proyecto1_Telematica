@@ -1,4 +1,4 @@
-[Main README](README.md) | [Protocolos](.github/PROTOCOLOS.md) 
+[Protocolos](.github/PROTOCOLOS.md) 
 
 ## Prerrequisitos
 - Docker Desktop instalado y corriendo
