@@ -11,7 +11,7 @@ from urllib.parse import parse_qs
 
 AUTH_HOST    = "localhost"
 AUTH_PORT    = 9090
-IOT_HOST     = "localhost"
+IOT_HOST     = "iot-telematica.duckdns.org"
 IOT_PORT     = 8081
 GATEWAY_PORT = 8082
 HOST         = "localhost"
