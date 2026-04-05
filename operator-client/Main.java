@@ -1,7 +1,7 @@
 import javax.swing.*;
 
 public class Main {
-    private static final String SERVER_HOST = "localhost";
+    private static final String SERVER_HOST = "iot-telematica.duckdns.org";
     private static final int SERVER_PORT = 8080;
 
     public static void main(String[] args) {
