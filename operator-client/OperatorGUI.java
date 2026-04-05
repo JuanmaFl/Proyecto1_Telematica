@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// Este es el main del cliente operador, se encarga de pedir el nombre del operador, conectarse al servidor y lanzar la interfaz grafica.
 public class OperatorGUI extends JFrame {
     private ServerConnection connection;
     private DefaultTableModel sensorsTableModel;
@@ -47,7 +48,7 @@ public class OperatorGUI extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
-
+    // Aqui se construye la barra superior con el titulo, estadisticas y boton de actualizar.
     private JPanel buildTopBar() {
         JPanel bar = new JPanel(new BorderLayout());
         bar.setBackground(BG_HEADER);
@@ -83,6 +84,7 @@ public class OperatorGUI extends JFrame {
         return bar;
     }
 
+    // Metodo auxiliar para crear etiquetas de estadisticas.
     private JLabel makeStatLabel(String text) {
         JLabel l = new JLabel(text);
         l.setFont(new Font("Arial", Font.PLAIN, 13));
@@ -90,6 +92,7 @@ public class OperatorGUI extends JFrame {
         return l;
     }
 
+    // Aqui se construye el panel central con la tabla de sensores a la izquierda y las alertas a la derecha.
     private JPanel buildCenter() {
         JPanel center = new JPanel(new GridLayout(1, 2, 6, 0));
         center.setBackground(BG_DARK);
@@ -99,6 +102,7 @@ public class OperatorGUI extends JFrame {
         return center;
     }
 
+    // Aqui se contruye el panel izquierdo.
     private JPanel buildLeftPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 6));
         panel.setBackground(BG_DARK);
@@ -149,6 +153,7 @@ public class OperatorGUI extends JFrame {
         return panel;
     }
 
+    // Aqui se contruye el panel derecho.
     private JPanel buildRightPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(BG_DARK);
@@ -183,7 +188,7 @@ public class OperatorGUI extends JFrame {
         panel.add(alertsScroll, BorderLayout.CENTER);
         return panel;
     }
-
+    // Aqui construimos la barra inferior con botones para listar sensores y consultar el estado del sistema.
     private JPanel buildBottomBar() {
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
         bar.setBackground(BG_HEADER);
@@ -209,7 +214,7 @@ public class OperatorGUI extends JFrame {
             BorderFactory.createEmptyBorder(6, 14, 6, 14)));
         return b;
     }
-
+    // Este metodo se encarga de enviar el comando para listar los sensores, parsear la respuesta y actualizar la tabla y el panel de graficos.
     public void refreshSensors() {
         new Thread(() -> {
             String response = connection.sendCommand("LIST SENSORS");
@@ -252,7 +257,7 @@ public class OperatorGUI extends JFrame {
             });
         }).start();
     }
-
+    // Este metodo se encarga de enviar el comando para consultar el estado del sistema y mostrar la respuesta.
     private String parseLastValue(String response) {
         if (response == null || response.contains("NO_DATA") || response.contains("ERROR")) return "—";
         String[] lines = response.trim().split("\n");
@@ -261,13 +266,13 @@ public class OperatorGUI extends JFrame {
         if (parts.length >= 3) return parts[2];
         return "—";
     }
-
+    // Este metodo se encarga de enviar el comando para consultar el estado del sistema y mostrar la respuesta.
     private void queryStatus() {
         String response = connection.sendCommand("STATUS");
         JOptionPane.showMessageDialog(this, response, "Estado del sistema",
                 JOptionPane.INFORMATION_MESSAGE);
     }
-
+    // Aqui nos encargamos de agregar una nueva alerta a la lista de alertas en tiempo real.
     public void addAlert(String alert) {
         SwingUtilities.invokeLater(() -> {
             alertCount++;

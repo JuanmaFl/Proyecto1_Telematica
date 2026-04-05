@@ -1,5 +1,5 @@
-import random
-from sensor import Sensor
+import random # Para generar valores aleatorios de sensores
+from sensor import Sensor # aqui se importa la clase base Sensor para crear nuestras clases específicas de sensores
 
 
 class TemperatureSensor(Sensor):

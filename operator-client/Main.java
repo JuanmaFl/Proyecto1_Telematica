@@ -1,5 +1,7 @@
 import javax.swing.*;
 
+// Este es el main del cliente operador, se encarga de pedir el nombre del operador, conectarse al servidor y lanzar la interfaz grafica.
+
 public class Main {
     private static final String SERVER_HOST = "iot-telematica.duckdns.org";
     private static final int SERVER_PORT = 8080;

@@ -1,7 +1,7 @@
 """
-Web Gateway — Puerto 8082
-Sirve la interfaz web, valida credenciales contra el Auth Service (9090)
-y consulta el estado del servidor IoT (8081).
+Web Gateway del servidor — Puerto 8082
+Sirve la interfaz web, valida credenciales con el servicio de autenticacion en el puerto 9090
+y consulta el estado del servidor IoT en el puerto 8081.
 """
 
 import socket
@@ -10,12 +10,13 @@ import threading
 from urllib.parse import parse_qs
 
 AUTH_HOST    = "localhost"
-AUTH_PORT    = 9090
-IOT_HOST     = "iot-telematica.duckdns.org"
-IOT_PORT     = 8081
-GATEWAY_PORT = 8082
+AUTH_PORT    = 9090 #Puerto del servicio de autenticacion
+IOT_HOST     = "iot-telematica.duckdns.org" #Aqui va el DNS de nuestro servidor IoT
+IOT_PORT     = 8081 # Aqui va el puerto del servicio de estado del servidor IoT (HTTP)
+GATEWAY_PORT = 8082 # Puerto donde corremos este Web Gateway
 HOST         = "localhost"
 
+# El CSS para el Dashboard y el Login, para que se vea un poco mejor.
 DASHBOARD_CSS = """
 <style>
   body{font-family:Arial,sans-serif;background:#1a1a2e;color:#eee;margin:0}
@@ -38,6 +39,7 @@ DASHBOARD_CSS = """
 </style>
 """
 
+# Este CSS es para el Login, el otro es para el Dashboard
 LOGIN_CSS = """
 <style>
   body{font-family:Arial,sans-serif;background:#1a1a2e;color:#eee;
@@ -56,6 +58,8 @@ LOGIN_CSS = """
   .note{color:#666;text-align:center;margin-top:16px;font-size:12px}
 </style>
 """
+
+# Aqui generamos el Login con HTML.
 
 def get_login_html(error=""):
     return f"""<!DOCTYPE html>
@@ -76,7 +80,7 @@ def get_login_html(error=""):
   <p class='note'>Usuarios: admin / operator1 / operator2</p>
 </div></body></html>"""
 
-
+# Esta funcion hace una consulta HTTP GET a un host y puerto especificos .
 def http_get(host, port, path):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -98,7 +102,7 @@ def http_get(host, port, path):
         print(f"[GATEWAY] Error consultando {host}:{port}{path} → {e}")
         return None
 
-
+# Esta funcion envia una respuesta HTTP con el status code, texto, tipo de contenido y el cuerpo especificados.
 def send_response(conn, status_code, status_text, content_type, body):
     body_bytes = body.encode()
     response = (
@@ -110,6 +114,7 @@ def send_response(conn, status_code, status_text, content_type, body):
     ).encode() + body_bytes
     conn.sendall(response)
 
+# En esta funcion consultamos la lista de sensores via TCP al servidor IoT.
 def get_sensors_tcp():
     """Consulta la lista de sensores via TCP al servidor IoT."""
     try:
@@ -125,7 +130,8 @@ def get_sensors_tcp():
     except Exception as e:
         print(f"[GATEWAY] Error consultando sensores TCP: {e}")
         return None
-    
+
+# Aqui se contruye el HTML con la informacion del usuario los sensores y los operadores.
 def build_dashboard(username, role, iot_status, iot_sensors):
     sensors_rows = ""
     if iot_sensors:
@@ -184,6 +190,8 @@ def build_dashboard(username, role, iot_status, iot_sensors):
   <p class='note'>Página se actualiza cada 30 segundos.</p>
 </div></body></html>"""
 
+# Aqui manejamos las solicitudes entrantes y se responde con un HTML indicando si es valido o no el usuario
+# Ademas de mostrar el dashboard con la informacion del servidor IoT.
 
 def handle_request(conn):
     try:
@@ -251,13 +259,14 @@ def handle_request(conn):
         except:
             pass
 
+# Aqui el main se queda esuchando en el puerto 8082 y si llega una slicitud nueva se crea u hilo para manejarla.
 def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((HOST, GATEWAY_PORT))
     server.listen(50)
     print(f"[GATEWAY] Web Gateway corriendo en puerto {GATEWAY_PORT}")
-    print(f"[GATEWAY] Abrí http://localhost:{GATEWAY_PORT} en el browser")
+    print(f"[GATEWAY] Abrir http://localhost:{GATEWAY_PORT} en el browser")
 
     while True:
         try:

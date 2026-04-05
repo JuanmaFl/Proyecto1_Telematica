@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 
+// En esta clase no sencargamos de manejar la conxesion al server y enviar comandos y recibir alertas en tiempo real.
 public class ServerConnection {
     private String host;
     private int port;
@@ -18,6 +19,7 @@ public class ServerConnection {
         this.port = port;
     }
 
+    // Aqui se establece la conexión con el servidor, se registran dos sockets (uno para comandos y otro para alertas) y se devuelve true si el registro fue exitoso.
     public boolean connect(String username) {
         try {
             commandSocket = new Socket(host, port);
@@ -51,7 +53,7 @@ public class ServerConnection {
         }
     }
 
-    // Para GET DATA que devuelve múltiples líneas
+    // Para el GET DATA que devuelve múltiples líneas de respuesta.
     public String sendCommandMultiLine(String command) {
         try {
             commandSocket.setSoTimeout(500);
@@ -72,6 +74,7 @@ public class ServerConnection {
         }
     }
 
+    // Aqui se lanza un hilo que escucha el socket de alertas y si llega una alerta se llama el metodo onAlert.
     public void listenForAlerts(AlertListener listener) {
         Thread t = new Thread(() -> {
             try {
@@ -92,7 +95,8 @@ public class ServerConnection {
     public interface AlertListener {
         void onAlert(String message);
     }
-
+    
+    // Este metodo se encarga de cerrar los sockets y liberar recursos al cerrar la aplicación.
     public void close() {
         try {
             if (commandSocket != null) commandSocket.close();

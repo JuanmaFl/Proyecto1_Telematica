@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 
+// Este es el panel personalizado para mostrar gráficos de sensores en tiempo real.
+
 public class ChartPanel extends JPanel {
     private final Map<String, float[]> sensorHistory = new LinkedHashMap<>();
     private final Map<String, String> sensorTypes = new LinkedHashMap<>();
@@ -18,11 +20,12 @@ public class ChartPanel extends JPanel {
         new Color(180, 120, 255)
     };
 
+    // Constructuor del panel 
     public ChartPanel() {
         setBackground(new Color(18, 18, 28));
         setPreferredSize(new Dimension(400, 200));
     }
-
+    //  Metodo que se usa para actualizar los datos de un sensor y se guardna los utlimos valores para graficar.
     public void updateSensor(String id, String type, float value) {
         sensorTypes.put(id, type);
         float[] history = sensorHistory.getOrDefault(id, new float[0]);
@@ -34,6 +37,7 @@ public class ChartPanel extends JPanel {
         repaint();
     }
 
+    //  Aqui se dibuja el panel y los graficos.
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
