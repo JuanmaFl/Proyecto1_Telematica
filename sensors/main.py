@@ -1,7 +1,7 @@
 import threading
 from sensors_types import TemperatureSensor, VibrationSensor, EnergySensor
 
-# Crear los 5 sensores simulados
+# Aqui se establecen las simulaciones de los 5 sensores.
 sensores = [
     TemperatureSensor("temp_01"),
     TemperatureSensor("temp_02"),
@@ -10,13 +10,14 @@ sensores = [
     EnergySensor("energy_01"),
 ]
 
-# Lanzar cada sensor en su propio hilo
+# Lanzamos cada sensor en su propio hilo.
 hilos = []
 for sensor in sensores:
     t = threading.Thread(target=sensor.run, daemon=True)
     t.start()
     hilos.append(t)
 
+# Esperamos a que los hilos terminen (en este caso, correrán indefinidamente hasta que se interrumpa el programa).
 print("Todos los sensores iniciados. Presioná Ctrl+C para detener.")
 
 try:

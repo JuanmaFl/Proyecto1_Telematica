@@ -1,7 +1,7 @@
 """
-Auth Service — Puerto 9090
-Servicio externo de identidad. Valida usuarios y retorna su rol.
-El servidor web consulta este servicio antes de dar acceso.
+Servicio de autenticacion externa — En el Puerto 9090
+En este se validan los usuarios y sus roles (OPERATOR o SENSOR).
+En el servidor web se consulta este servicio antes otorgar acceso a las funcionalidades.
 """
 
 import socket
@@ -11,7 +11,7 @@ import threading
 HOST = "localhost"
 PORT = 9090
 
-# Base de usuarios — en producción sería una BD externa
+# Base de datoss de usuarios con contraseñas y roles definidos
 USERS = {
     "admin":    {"password": "admin123",  "role": "OPERATOR"},
     "operator1": {"password": "op1pass",  "role": "OPERATOR"},
@@ -20,14 +20,14 @@ USERS = {
     "sensor2":  {"password": "sens2pass", "role": "SENSOR"},
 }
 
-
+# Esta funcion Valida el usuario y la Contraseña 
 def validate_user(username, password):
     user = USERS.get(username)
     if user and user["password"] == password:
         return {"valid": True, "role": user["role"], "username": username}
     return {"valid": False, "role": None, "username": username}
 
-
+# Esta funcion Parsea los parametros de la consulta GET
 def parse_query_params(path):
     params = {}
     if "?" in path:
@@ -38,7 +38,7 @@ def parse_query_params(path):
                 params[k] = v
     return params
 
-
+# Aqui se manejan las solicitudes entrantes y se responde con un JSON indicando si es valido o no el usuario
 def handle_request(conn):
     try:
         data = conn.recv(4096).decode()
@@ -86,7 +86,7 @@ def handle_request(conn):
     finally:
         conn.close()
 
-
+#Este es el amin que se queda escuchado en el puerto 9090 y cada vez que llega una solicitud se crea un nuevo hilo para manejarla
 def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
